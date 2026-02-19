@@ -18,4 +18,5 @@ async function main() {
     throw new Error("There's Something wrong");
   }
 }
+
 main();

@@ -1,0 +1,24 @@
+enum USER_ROLE {
+    ADMIN
+    STUDENT
+    TUTOR
+}
+
+enum STATUS {
+    BAN
+    UNBAN
+}
+
+model User {
+    id        String    @id @default(uuid())
+    name      String
+    email     String    @unique
+    password  String
+    role      USER_ROLE @default(STUDENT)
+    status    STATUS    @default(UNBAN)
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+
+    @@index([email, status])
+    @@map("users")
+}
