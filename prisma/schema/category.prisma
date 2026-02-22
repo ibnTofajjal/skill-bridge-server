@@ -1,0 +1,13 @@
+enum SUBJECT_NAME {
+    MATHEMATICS
+    PHYSICS
+    CHEMISTRY
+    BIOLOGY
+    HISTORY
+}
+
+model Category {
+    id            String         @id @default(uuid())
+    name          SUBJECT_NAME   @unique
+    tutorProfiles TutorProfile[]
+}

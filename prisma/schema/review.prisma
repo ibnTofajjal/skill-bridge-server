@@ -1,0 +1,12 @@
+model Review {
+    id        String   @id @default(uuid())
+    rating    Int // ১ থেকে ৫ এর মধ্যে
+    comment   String   @db.Text
+    createdAt DateTime @default(now())
+
+    studentId String
+    student   User   @relation(fields: [studentId], references: [id])
+
+    tutorProfileId String
+    tutorProfile   TutorProfile @relation(fields: [tutorProfileId], references: [id])
+}
