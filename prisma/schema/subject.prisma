@@ -17,7 +17,7 @@ enum SUBJECT_NAMES {
 
 model Subject {
     id   String        @id @default(uuid())
-    name SUBJECT_NAMES
+    name SUBJECT_NAMES @unique
 
     tutorProfiles TutorProfile[]
 
