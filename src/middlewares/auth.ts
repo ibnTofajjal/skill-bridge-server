@@ -4,34 +4,40 @@ import jwt from "jsonwebtoken";
 import config from "../config";
 import { prisma } from "../lib/prisma";
 import { IUser } from "../modules/auth/types";
+import { AppError } from "../lib/AppError";
 
 export const auth = (...roles: USER_ROLE[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const token = req.headers.authorization;
-      if (!token) throw new Error("Token Not Found");
+      if (!token) throw new AppError("Token not found", 401);
+
       const decodedUser = jwt.verify(token, config.jwt_secret!) as IUser;
 
-      // Check the db, that the provided user is in the db or just a fake req
       const userData = await prisma.user.findUnique({
         select: { email: true, role: true, status: true },
-        where: {
-          email: decodedUser.email,
-        },
+        where: { email: decodedUser.email },
       });
-      if (!userData) throw new Error("Unauthorized");
 
-      // is the given role include in the token or not, if so then should allow for the req if not throw the error.
+      if (!userData) throw new AppError("Unauthorized", 401);
+
       if (userData.status === STATUS.BAN) {
-        throw new Error("You are Banned");
-      } else if (roles.length && !roles.includes(decodedUser.role)) {
-        throw new Error("Unauthorized");
+        throw new AppError("Your account has been banned", 403);
+      }
+
+      if (roles.length && !roles.includes(decodedUser.role)) {
+        throw new AppError("You do not have permission to access this resource", 403);
       }
 
       req.user = decodedUser;
-
       next();
-    } catch (error: any) {
+    } catch (error) {
+      if (error instanceof jwt.TokenExpiredError) {
+        return next(new AppError("Your session has expired, please log in again", 401));
+      }
+      if (error instanceof jwt.JsonWebTokenError) {
+        return next(new AppError("Invalid token", 401));
+      }
       next(error);
     }
   };
