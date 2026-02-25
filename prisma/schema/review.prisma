@@ -1,0 +1,21 @@
+model Review {
+    id      Int     @id @default(autoincrement())
+    rating  Float
+    comment String?
+
+    studentId      String
+    tutorProfileId String
+
+    student User         @relation("StudentReviews", fields: [studentId], references: [id])
+    tutor   TutorProfile @relation("TutorReviews", fields: [tutorProfileId], references: [id])
+
+    // Metadata
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([studentId, tutorProfileId])
+    @@index([studentId])
+    @@index([tutorProfileId])
+    @@index([rating])
+    @@map("reviews")
+}

@@ -1,0 +1,26 @@
+enum BOOKING_STATUS {
+    PENDING
+    CONFIRMED
+    COMPLETED
+    CANCELLED
+}
+
+model Booking {
+    id          Int            @id @default(autoincrement())
+    sessionTime DateTime
+    status      BOOKING_STATUS @default(PENDING)
+    duration    Int
+
+    studentId      String
+    tutorProfileId String
+
+    student User         @relation("StudentBookings", fields: [studentId], references: [id])
+    tutor   TutorProfile @relation("TutorBookings", fields: [tutorProfileId], references: [id])
+
+    // Metadata
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([status])
+    @@map("bookings")
+}

@@ -1,0 +1,30 @@
+enum SUBJECT_NAMES {
+    HISTORY
+    PHILOSOPHY
+    ISLAMIC_HISTORY
+    PHYSICS
+    CHEMISTRY
+    MATHEMATICS
+    STATISTICS
+    BIOLOGY
+    PSYCHOLOGY
+    ZOOLOGY
+    ACCOUNTING
+    FINANCE
+    MARKETING
+    MANAGEMENT
+}
+
+model Subject {
+    id   String        @id @default(uuid())
+    name SUBJECT_NAMES
+
+    tutorProfiles TutorProfile[]
+
+    // Metadata
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([id, name])
+    @@map("subjects")
+}
