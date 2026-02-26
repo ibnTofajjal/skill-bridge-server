@@ -6,11 +6,12 @@ import { USER_ROLE } from "../../../prisma/generated/prisma/enums";
 const router = express.Router();
 
 router.post("/profile", auth(USER_ROLE.TUTOR), tutorController.createProfile);
+router.get("/profile", auth(USER_ROLE.TUTOR), tutorController.getProfile);
 
-router.patch(
-  "/profile/:id",
+router.get(
+  "/profile/availability",
   auth(USER_ROLE.TUTOR),
-  tutorController.updateProfile,
+  tutorController.getMyAvailability,
 );
 
 router.post(
@@ -23,6 +24,12 @@ router.delete(
   "/profile/availability/:id",
   auth(USER_ROLE.TUTOR),
   tutorController.deleteAvailability,
+);
+
+router.patch(
+  "/profile/:id",
+  auth(USER_ROLE.TUTOR),
+  tutorController.updateProfile,
 );
 
 export const tutorRouter = router;

@@ -112,11 +112,11 @@ const setAvailability = async (req: Request, res: Response) => {
       return;
     }
 
-    const result = await tutorService.setAvailability(parsed.data);
+    const result = await tutorService.setAvailability(parsed.data, user.id);
 
     res.status(201).json({
       status: "success",
-      message: "You successfully created your Tutor Profile",
+      message: "Availability slot created successfully",
       data: result,
     });
   } catch (error: any) {
@@ -131,7 +131,6 @@ const setAvailability = async (req: Request, res: Response) => {
 const deleteAvailability = async (req: Request, res: Response) => {
   try {
     const availableSlotId = req.params.id;
-    const { tutorProfileId } = req.body;
     const user = req.user;
     if (!user?.id) throw new AppError("user not found", 403);
 
@@ -144,12 +143,68 @@ const deleteAvailability = async (req: Request, res: Response) => {
 
     const result = await tutorService.deleteAvailability(
       availableSlotId as string,
-      tutorProfileId as string,
+      user.id,
     );
 
-    res.status(201).json({
+    res.status(200).json({
       status: "success",
-      message: "Available slot deleted",
+      message: "Availability slot deleted successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(error.statusCode ?? 500).json({
+      status: "failed",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+const getProfile = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    if (!user?.id) throw new AppError("user not found", 403);
+
+    if (user?.role !== USER_ROLE.TUTOR) {
+      throw new AppError(
+        "You do not have permission to access this resource",
+        403,
+      );
+    }
+
+    const result = await tutorService.getProfile(user.id);
+
+    res.status(200).json({
+      status: "success",
+      message: "Tutor profile fetched successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(error.statusCode ?? 500).json({
+      status: "failed",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+const getMyAvailability = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    if (!user?.id) throw new AppError("user not found", 403);
+
+    if (user?.role !== USER_ROLE.TUTOR) {
+      throw new AppError(
+        "You do not have permission to access this resource",
+        403,
+      );
+    }
+
+    const result = await tutorService.getMyAvailability(user.id);
+
+    res.status(200).json({
+      status: "success",
+      message: "Availability slots fetched successfully",
       data: result,
     });
   } catch (error: any) {
@@ -166,6 +221,6 @@ export const tutorController = {
   updateProfile,
   setAvailability,
   deleteAvailability,
+  getProfile,
+  getMyAvailability,
 };
-
-// user -> tutor -> tutorID -> oi tutor er availability kina

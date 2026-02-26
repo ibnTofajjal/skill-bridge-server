@@ -1,4 +1,5 @@
 import { prisma } from "../../lib/prisma";
+import { AppError } from "../../lib/AppError";
 import {
   TutorAvailability,
   TutorProfileCreate,
@@ -38,7 +39,17 @@ const updateProfile = async (
   return profileUpdate;
 };
 
-const setAvailability = async (payload: TutorAvailability) => {
+const setAvailability = async (payload: TutorAvailability, userId: string) => {
+  const profile = await prisma.tutorProfile.findFirst({
+    where: { id: payload.tutorProfileId, userId },
+  });
+
+  if (!profile)
+    throw new AppError(
+      "You are not authorized to set availability for this profile",
+      403,
+    );
+
   const availableTime = await prisma.availability.create({
     data: payload,
   });
@@ -48,16 +59,59 @@ const setAvailability = async (payload: TutorAvailability) => {
 
 const deleteAvailability = async (
   availableSlotId: string,
-  tutorProfileId: string,
+  userId: string,
 ) => {
+  const slot = await prisma.availability.findFirst({
+    where: { id: availableSlotId },
+    include: { tutorProfile: { select: { userId: true } } },
+  });
+
+  if (!slot) throw new AppError("Availability slot not found", 404);
+
+  if (slot.tutorProfile.userId !== userId)
+    throw new AppError(
+      "You are not authorized to delete this availability slot",
+      403,
+    );
+
   const deleteSlot = await prisma.availability.delete({
-    where: {
-      id: availableSlotId,
-      tutorProfileId: tutorProfileId,
-    },
+    where: { id: availableSlotId },
   });
 
   return deleteSlot;
+};
+
+const getProfile = async (userId: string) => {
+  const profile = await prisma.tutorProfile.findFirst({
+    where: { userId },
+    include: {
+      user: { select: { id: true, name: true, email: true } },
+      subject: true,
+      availabilities: true,
+      receivedBookings: true,
+      receivedReviews: true,
+    },
+  });
+
+  if (!profile) throw new Error("Tutor profile not found");
+
+  return profile;
+};
+
+const getMyAvailability = async (userId: string) => {
+  const profile = await prisma.tutorProfile.findFirst({
+    where: { userId },
+    select: { id: true },
+  });
+
+  if (!profile) throw new Error("Tutor profile not found");
+
+  const slots = await prisma.availability.findMany({
+    where: { tutorProfileId: profile.id },
+    orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }],
+  });
+
+  return slots;
 };
 
 export const tutorService = {
@@ -65,4 +119,6 @@ export const tutorService = {
   updateProfile,
   setAvailability,
   deleteAvailability,
+  getProfile,
+  getMyAvailability,
 };
