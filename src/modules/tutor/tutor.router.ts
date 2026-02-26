@@ -36,4 +36,7 @@ router.patch(
   tutorController.updateProfile,
 );
 
+// Public — get single tutor by profile ID (includes available slots & reviews)
+router.get("/:id", tutorController.getTutorById);
+
 export const tutorRouter = router;

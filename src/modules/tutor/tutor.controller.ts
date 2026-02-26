@@ -250,6 +250,24 @@ const getAllTutors = async (req: Request, res: Response) => {
   }
 };
 
+const getTutorById = async (req: Request, res: Response) => {
+  try {
+    const result = await tutorService.getTutorById(req.params.id as string);
+
+    res.status(200).json({
+      status: "success",
+      message: "Tutor fetched successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(error.statusCode ?? 500).json({
+      status: "failed",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
 export const tutorController = {
   createProfile,
   updateProfile,
@@ -258,4 +276,5 @@ export const tutorController = {
   getProfile,
   getMyAvailability,
   getAllTutors,
+  getTutorById,
 };
