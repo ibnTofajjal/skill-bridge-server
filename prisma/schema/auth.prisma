@@ -10,19 +10,18 @@ enum STATUS {
 }
 
 model User {
-    id        String    @id @default(uuid())
-    name      String
-    email     String    @unique
-    password  String
-    role      USER_ROLE @default(STUDENT)
-    status    STATUS    @default(UNBAN)
-    createdAt DateTime  @default(now())
-    updatedAt DateTime  @updatedAt
-
-    tutorProfile TutorProfile?
-
-    bookings Booking[] @relation("StudentBooking")
-    reviews  Review[]
+    id             String         @id @default(uuid())
+    name           String
+    email          String         @unique
+    password       String
+    role           USER_ROLE      @default(STUDENT)
+    status         STATUS         @default(UNBAN)
+    createdAt      DateTime       @default(now())
+    updatedAt      DateTime       @updatedAt
+    // relation with other tables
+    writtenReviews Review[]       @relation("StudentReviews")
+    bookingsMade   Booking[]      @relation("StudentBookings")
+    tutorProfiles  TutorProfile[]
 
     @@index([email, status])
     @@map("users")

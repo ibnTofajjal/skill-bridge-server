@@ -1,19 +1,26 @@
-enum WEEKDAY {
-    MONDAY
-    TUESDAY
-    WEDNESDAY
-    THURSDAY
-    FRIDAY
-    SATURDAY
-    SUNDAY
+enum DAY_OF_WEEK {
+  SUN
+  MON
+  TUE
+  WED
+  THU
+  FRI
+  SAT
 }
 
 model Availability {
-    id        String  @id @default(uuid())
-    day       WEEKDAY
-    startTime String
-    endTime   String
+  id             String       @id @default(uuid())
+  tutorProfileId String
+  tutorProfile   TutorProfile @relation(fields: [tutorProfileId], references: [id])
+  dayOfWeek      DAY_OF_WEEK
+  startTime      DateTime
+  endTime        DateTime
+  isBooked       Boolean?     @default(false)
 
-    tutorProfileId String
-    tutorProfile   TutorProfile @relation(fields: [tutorProfileId], references: [id], onDelete: Cascade)
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([dayOfWeek])
+  @@map("Availabilities")
 }

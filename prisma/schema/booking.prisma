@@ -1,11 +1,26 @@
+enum BOOKING_STATUS {
+    PENDING
+    CONFIRMED
+    COMPLETED
+    CANCELLED
+}
+
 model Booking {
-    id          String   @id @default(uuid())
-    bookingDate DateTime @default(now())
+    id          Int            @id @default(autoincrement())
+    sessionTime DateTime
+    status      BOOKING_STATUS @default(PENDING)
+    duration    Int
 
-    // student booking korbe
-    studentId String
-    student   User   @relation("StudentBooking", fields: [studentId], references: [id], onDelete: Cascade)
-
+    studentId      String
     tutorProfileId String
-    tutorProfile   TutorProfile @relation("TutorBooking", fields: [tutorProfileId], references: [id], onDelete: Cascade)
+
+    student User         @relation("StudentBookings", fields: [studentId], references: [id])
+    tutor   TutorProfile @relation("TutorBookings", fields: [tutorProfileId], references: [id])
+
+    // Metadata
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([status])
+    @@map("bookings")
 }

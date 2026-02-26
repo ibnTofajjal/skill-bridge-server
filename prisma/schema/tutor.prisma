@@ -1,16 +1,27 @@
 model TutorProfile {
   id           String  @id @default(uuid())
-  bio          String  @db.Text
-  pricePerHour Float
-  experience   String?
+  bio          String?
+  experience   String
+  university   String
+  pricePerHour Int
+  major        String
+  age          Int?
+  cgpa         Float
 
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 
-  categoryId String
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id])
 
-  availabilities Availability[]
-  bookings       Booking[]      @relation("TutorBooking")
-  reviews        Review[]
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  receivedReviews  Review[]       @relation("TutorReviews")
+  receivedBookings Booking[]      @relation("TutorBookings")
+  availabilities   Availability[]
+
+  @@index([id])
+  @@map("tutorProfiles")
 }
