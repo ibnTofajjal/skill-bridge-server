@@ -6,10 +6,17 @@ import { USER_ROLE } from "../../../prisma/generated/prisma/enums";
 const router = express.Router();
 
 router.post("/profile", auth(USER_ROLE.TUTOR), tutorController.createProfile);
+
 router.patch(
   "/profile/:id",
   auth(USER_ROLE.TUTOR),
   tutorController.updateProfile,
+);
+
+router.post(
+  "/profile/availability",
+  auth(USER_ROLE.TUTOR),
+  tutorController.setAvailability,
 );
 
 export const tutorRouter = router;

@@ -1,4 +1,3 @@
-
 enum DAY_OF_WEEK {
   SUN
   MON
@@ -16,7 +15,7 @@ model Availability {
   dayOfWeek      DAY_OF_WEEK
   startTime      DateTime
   endTime        DateTime
-  isBooked       Boolean
+  isBooked       Boolean?     @default(false)
 
   // Metadata
   createdAt DateTime @default(now())

@@ -1,5 +1,9 @@
 import { prisma } from "../../lib/prisma";
-import { TutorProfileCreate, TutorProfileUpdate } from "./tutor.types";
+import {
+  TutorAvailability,
+  TutorProfileCreate,
+  TutorProfileUpdate,
+} from "./tutor.types";
 
 const createProfile = async (payload: TutorProfileCreate, userId: string) => {
   const existingProfile = await prisma.tutorProfile.findFirst({
@@ -34,7 +38,16 @@ const updateProfile = async (
   return profileUpdate;
 };
 
+const setAvailability = async (payload: TutorAvailability) => {
+  const availableTime = await prisma.availability.create({
+    data: payload,
+  });
+
+  return availableTime;
+};
+
 export const tutorService = {
   createProfile,
   updateProfile,
+  setAvailability,
 };

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DAY_OF_WEEK } from "../../../prisma/generated/prisma/enums";
 
 export const tutorProfileCreateSchema = z
   .object({
@@ -23,5 +24,16 @@ export const tutorProfileUpdateSchema = z
   })
   .strict();
 
+export const tutorAvailabilitySchema = z
+  .object({
+    tutorProfileId: z.string(),
+    dayOfWeek: z.enum(DAY_OF_WEEK),
+    startTime: z.string(),
+    endTime: z.string(),
+    isBooked: z.boolean().optional(),
+  })
+  .strict();
+
 export type TutorProfileCreate = z.infer<typeof tutorProfileCreateSchema>;
 export type TutorProfileUpdate = z.infer<typeof tutorProfileUpdateSchema>;
+export type TutorAvailability = z.infer<typeof tutorAvailabilitySchema>;

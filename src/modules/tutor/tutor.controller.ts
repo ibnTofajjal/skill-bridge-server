@@ -3,6 +3,7 @@ import { tutorService } from "./tutor.service";
 import { USER_ROLE } from "../../../prisma/generated/prisma/enums";
 import { AppError } from "../../lib/AppError";
 import {
+  tutorAvailabilitySchema,
   tutorProfileCreateSchema,
   tutorProfileUpdateSchema,
 } from "./tutor.types";
@@ -89,7 +90,45 @@ const updateProfile = async (req: Request, res: Response) => {
   }
 };
 
+const setAvailability = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    if (!user?.id) throw new AppError("user not found", 403);
+
+    if (user?.role !== USER_ROLE.TUTOR) {
+      throw new AppError(
+        "You do not have permission for accessing this resource",
+        403,
+      );
+    }
+
+    const parsed = tutorAvailabilitySchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        status: "failed",
+        message: getValidationMessage(parsed.error),
+        errors: parsed.error.flatten().fieldErrors,
+      });
+      return;
+    }
+
+    const result = await tutorService.setAvailability(parsed.data);
+
+    res.status(201).json({
+      status: "success",
+      message: "You successfully created your Tutor Profile",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(error.statusCode ?? 500).json({
+      status: "failed",
+      message: error.message,
+      data: null,
+    });
+  }
+};
 export const tutorController = {
   createProfile,
   updateProfile,
+  setAvailability,
 };
