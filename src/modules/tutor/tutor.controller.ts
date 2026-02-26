@@ -216,6 +216,40 @@ const getMyAvailability = async (req: Request, res: Response) => {
   }
 };
 
+const getAllTutors = async (req: Request, res: Response) => {
+  try {
+    const {
+      subjectId,
+      subjectName,
+      minPrice,
+      maxPrice,
+      page = "1",
+      limit = "10",
+    } = req.query as Record<string, string>;
+
+    const result = await tutorService.getAllTutors({
+      subjectId,
+      subjectName,
+      minPrice: minPrice !== undefined ? Number(minPrice) : undefined,
+      maxPrice: maxPrice !== undefined ? Number(maxPrice) : undefined,
+      page: Math.max(1, parseInt(page)),
+      limit: Math.min(50, Math.max(1, parseInt(limit))),
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "Tutors fetched successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(error.statusCode ?? 500).json({
+      status: "failed",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
 export const tutorController = {
   createProfile,
   updateProfile,
@@ -223,4 +257,5 @@ export const tutorController = {
   deleteAvailability,
   getProfile,
   getMyAvailability,
+  getAllTutors,
 };

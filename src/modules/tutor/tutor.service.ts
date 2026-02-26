@@ -114,6 +114,48 @@ const getMyAvailability = async (userId: string) => {
   return slots;
 };
 
+const getAllTutors = async (filters: {
+  subjectId?: string;
+  subjectName?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  page: number;
+  limit: number;
+}) => {
+  const { subjectId, subjectName, minPrice, maxPrice, page, limit } = filters;
+  const skip = (page - 1) * limit;
+
+  const where = {
+    ...(subjectId && { subjectId }),
+    ...(subjectName && { subject: { name: subjectName as any } }),
+    ...((minPrice !== undefined || maxPrice !== undefined) && {
+      pricePerHour: {
+        ...(minPrice !== undefined && { gte: minPrice }),
+        ...(maxPrice !== undefined && { lte: maxPrice }),
+      },
+    }),
+  };
+
+  const [tutors, total] = await Promise.all([
+    prisma.tutorProfile.findMany({
+      where,
+      skip,
+      take: limit,
+      include: {
+        user: { select: { id: true, name: true, email: true } },
+        subject: true,
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.tutorProfile.count({ where }),
+  ]);
+
+  return {
+    tutors,
+    meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+  };
+};
+
 export const tutorService = {
   createProfile,
   updateProfile,
@@ -121,4 +163,5 @@ export const tutorService = {
   deleteAvailability,
   getProfile,
   getMyAvailability,
+  getAllTutors,
 };
