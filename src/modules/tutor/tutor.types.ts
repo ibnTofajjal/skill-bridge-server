@@ -1,10 +1,27 @@
-export interface TutorProfileCreate {
-  bio?: string | null;
-  experience: string;
-  university: string;
-  pricePerHour: number; // in whole dollars (Int)
-  major: string;
-  age?: number | null;
-  cgpa: number; // float
-  subjectId: string;
-}
+import { z } from "zod";
+
+export const tutorProfileCreateSchema = z
+  .object({
+    bio: z.string().nullable().optional(),
+    experience: z.string(),
+    university: z.string(),
+    pricePerHour: z.number().int().positive(),
+    major: z.string(),
+    age: z.number().int().positive().nullable().optional(),
+    cgpa: z.number().positive(),
+    subjectId: z.string().uuid(),
+  })
+  .strict();
+
+export const tutorProfileUpdateSchema = z
+  .object({
+    bio: z.string().nullable().optional(),
+    experience: z.string(),
+    pricePerHour: z.number().int().positive(),
+    age: z.number().int().positive().nullable().optional(),
+    subjectId: z.string().uuid(),
+  })
+  .strict();
+
+export type TutorProfileCreate = z.infer<typeof tutorProfileCreateSchema>;
+export type TutorProfileUpdate = z.infer<typeof tutorProfileUpdateSchema>;

@@ -1,5 +1,5 @@
 import { prisma } from "../../lib/prisma";
-import { TutorProfileCreate } from "./tutor.types";
+import { TutorProfileCreate, TutorProfileUpdate } from "./tutor.types";
 
 const createProfile = async (payload: TutorProfileCreate, userId: string) => {
   const existingProfile = await prisma.tutorProfile.findFirst({
@@ -15,7 +15,24 @@ const createProfile = async (payload: TutorProfileCreate, userId: string) => {
   return profile;
 };
 
-const updateProfile = async () => {};
+const updateProfile = async (
+  payload: TutorProfileUpdate,
+  userId: string,
+  profileId: string,
+) => {
+  const existingProfile = await prisma.tutorProfile.findFirst({
+    where: { userId },
+  });
+
+  if (!existingProfile) throw new Error("You don't have the tutor profile");
+
+  const profileUpdate = await prisma.tutorProfile.update({
+    where: { id: profileId, userId: userId },
+    data: payload,
+  });
+
+  return profileUpdate;
+};
 
 export const tutorService = {
   createProfile,
