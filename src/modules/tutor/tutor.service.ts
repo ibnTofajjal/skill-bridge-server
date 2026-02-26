@@ -46,8 +46,23 @@ const setAvailability = async (payload: TutorAvailability) => {
   return availableTime;
 };
 
+const deleteAvailability = async (
+  availableSlotId: string,
+  tutorProfileId: string,
+) => {
+  const deleteSlot = await prisma.availability.delete({
+    where: {
+      id: availableSlotId,
+      tutorProfileId: tutorProfileId,
+    },
+  });
+
+  return deleteSlot;
+};
+
 export const tutorService = {
   createProfile,
   updateProfile,
   setAvailability,
+  deleteAvailability,
 };

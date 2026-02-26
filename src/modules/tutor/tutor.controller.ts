@@ -127,8 +127,45 @@ const setAvailability = async (req: Request, res: Response) => {
     });
   }
 };
+
+const deleteAvailability = async (req: Request, res: Response) => {
+  try {
+    const availableSlotId = req.params.id;
+    const { tutorProfileId } = req.body;
+    const user = req.user;
+    if (!user?.id) throw new AppError("user not found", 403);
+
+    if (user?.role !== USER_ROLE.TUTOR) {
+      throw new AppError(
+        "You do not have permission for accessing this resource",
+        403,
+      );
+    }
+
+    const result = await tutorService.deleteAvailability(
+      availableSlotId as string,
+      tutorProfileId as string,
+    );
+
+    res.status(201).json({
+      status: "success",
+      message: "Available slot deleted",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(error.statusCode ?? 500).json({
+      status: "failed",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
 export const tutorController = {
   createProfile,
   updateProfile,
   setAvailability,
+  deleteAvailability,
 };
+
+// user -> tutor -> tutorID -> oi tutor er availability kina

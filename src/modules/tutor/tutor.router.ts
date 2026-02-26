@@ -19,4 +19,10 @@ router.post(
   tutorController.setAvailability,
 );
 
+router.delete(
+  "/profile/availability/:id",
+  auth(USER_ROLE.TUTOR),
+  tutorController.deleteAvailability,
+);
+
 export const tutorRouter = router;
