@@ -84,8 +84,30 @@ const updateBookingStatus = async (
   return updatedBooking;
 };
 
+const allBooking = async (userId: string, role: string) => {
+  if (role === "TUTOR") {
+    const tutorProfile = await prisma.tutorProfile.findFirst({
+      select: { id: true },
+      where: { userId },
+    });
+
+    if (!tutorProfile) {
+      throw new AppError("Tutor profile not found", 404);
+    }
+
+    return prisma.booking.findMany({
+      where: { tutorProfileId: tutorProfile.id },
+    });
+  }
+
+  return prisma.booking.findMany({
+    where: { studentId: userId },
+  });
+};
+
 export const bookingService = {
   createBooking,
   cancelBooking,
   updateBookingStatus,
+  allBooking,
 };

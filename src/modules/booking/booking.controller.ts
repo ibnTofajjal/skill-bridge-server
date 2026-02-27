@@ -134,8 +134,37 @@ const updateBookingStatus = async (req: Request, res: Response) => {
   }
 };
 
+const allBooking = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    if (!user?.id) throw new AppError("user not found", 403);
+
+    if (user?.role !== USER_ROLE.TUTOR && user?.role !== USER_ROLE.STUDENT) {
+      throw new AppError(
+        "You do not have permission to see the booking list",
+        403,
+      );
+    }
+
+    const result = await bookingService.allBooking(user.id, user.role);
+
+    res.status(201).json({
+      status: "success",
+      message: "You successfully retrived your all bookings",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(error.statusCode ?? 500).json({
+      status: "failed",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
 export const bookingController = {
   createBooking,
   cancelBooking,
   updateBookingStatus,
+  allBooking,
 };

@@ -5,6 +5,12 @@ import { USER_ROLE } from "../../../prisma/generated/prisma/enums";
 
 const router = express.Router();
 
+router.get(
+  "/",
+  auth(USER_ROLE.STUDENT, USER_ROLE.TUTOR),
+  bookingController.allBooking,
+);
+
 router.post("/", auth(USER_ROLE.STUDENT), bookingController.createBooking);
 
 // STUDENT AND TUTOR BOTH CAN CANCEL THE BOOKING STATUS
