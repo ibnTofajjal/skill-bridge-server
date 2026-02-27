@@ -11,6 +11,12 @@ router.get(
   bookingController.allBooking,
 );
 
+router.get(
+  "/:id",
+  auth(USER_ROLE.STUDENT, USER_ROLE.TUTOR),
+  bookingController.singleBooking,
+);
+
 router.post("/", auth(USER_ROLE.STUDENT), bookingController.createBooking);
 
 // STUDENT AND TUTOR BOTH CAN CANCEL THE BOOKING STATUS

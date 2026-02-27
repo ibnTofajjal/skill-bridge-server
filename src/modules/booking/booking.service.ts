@@ -105,9 +105,59 @@ const allBooking = async (userId: string, role: string) => {
   });
 };
 
+const singleBooking = async (
+  bookingId: string,
+  userId: string,
+  role: string,
+) => {
+  if (role === "TUTOR") {
+    const tutorProfile = await prisma.tutorProfile.findFirst({
+      select: { id: true },
+      where: { userId },
+    });
+
+    if (!tutorProfile) {
+      throw new AppError("Tutor profile not found", 404);
+    }
+
+    const booking = await prisma.booking.findFirst({
+      where: {
+        id: parseInt(bookingId),
+        tutorProfileId: tutorProfile.id,
+      },
+    });
+
+    if (!booking) {
+      throw new AppError(
+        "Booking not found or you do not have permission to view it",
+        403,
+      );
+    }
+
+    return booking;
+  }
+
+  const booking = await prisma.booking.findFirst({
+    where: {
+      id: parseInt(bookingId),
+      studentId: userId,
+    },
+  });
+
+  if (!booking) {
+    throw new AppError(
+      "Booking not found or you do not have permission to view it",
+      403,
+    );
+  }
+
+  return booking;
+};
+
 export const bookingService = {
   createBooking,
   cancelBooking,
   updateBookingStatus,
   allBooking,
+  singleBooking,
 };
