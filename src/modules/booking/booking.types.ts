@@ -16,5 +16,12 @@ export const cancelBookingSchema = z
   })
   .strict();
 
+export const updateBookingStatusSchema = z
+  .object({
+    status: z.enum(BOOKING_STATUS),
+  })
+  .strict();
+
 export type BookingCreate = z.infer<typeof bookingSchema>;
 export type BookingCancel = z.infer<typeof cancelBookingSchema>;
+export type BookingStatus = z.infer<typeof updateBookingStatusSchema>;

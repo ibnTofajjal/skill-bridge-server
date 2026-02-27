@@ -48,7 +48,44 @@ const cancelBooking = async (
   return updatedBooking;
 };
 
+const updateBookingStatus = async (
+  payload: BookingCancel,
+  userId: string,
+  bookingId: string,
+) => {
+  const tutorProfile = await prisma.tutorProfile.findFirst({
+    select: { id: true },
+    where: { userId },
+  });
+
+  if (!tutorProfile) {
+    throw new AppError("Only tutors can update booking status", 403);
+  }
+
+  const booking = await prisma.booking.findFirst({
+    where: {
+      id: parseInt(bookingId),
+      tutorProfileId: tutorProfile.id,
+    },
+  });
+
+  if (!booking) {
+    throw new AppError(
+      "Booking not found or you do not have permission to update it",
+      403,
+    );
+  }
+
+  const updatedBooking = await prisma.booking.update({
+    where: { id: booking.id },
+    data: { status: payload.status },
+  });
+
+  return updatedBooking;
+};
+
 export const bookingService = {
   createBooking,
   cancelBooking,
+  updateBookingStatus,
 };
