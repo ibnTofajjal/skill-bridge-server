@@ -40,6 +40,27 @@ const createReview = async (req: Request, res: Response) => {
   }
 };
 
+const allReview = async (req: Request, res: Response) => {
+  try {
+    const tutorProfileId = req.params.tutorProfileId as string;
+
+    const result = await reviewService.allReview(tutorProfileId);
+
+    res.status(200).json({
+      status: "success",
+      message: "Successfully retrieved all reviews",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(error.statusCode ?? 500).json({
+      status: "failed",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
 export const reviewController = {
   createReview,
+  allReview,
 };

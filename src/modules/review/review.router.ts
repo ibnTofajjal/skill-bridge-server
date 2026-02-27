@@ -6,5 +6,6 @@ import { reviewController } from "./review.controller";
 const router = express.Router();
 
 router.post("/", auth(USER_ROLE.STUDENT), reviewController.createReview);
+router.get("/:tutorProfileId", reviewController.allReview);
 
 export const reviewRouter = router;
