@@ -1,0 +1,134 @@
+import { Request, Response } from "express";
+import { AppError } from "../../lib/AppError";
+import { STATUS, USER_ROLE } from "../../../prisma/generated/prisma/enums";
+import { adminService } from "./admin.service";
+
+const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    if (!user?.id) throw new AppError("user not found", 403);
+
+    if (user?.role !== USER_ROLE.ADMIN) {
+      throw new AppError(
+        "You do not have permission to access this resource",
+        403,
+      );
+    }
+
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    const result = await adminService.getAllUsers(page, limit);
+
+    res.status(200).json({
+      status: "success",
+      message: "You successfully retrived all users",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(error.statusCode ?? 500).json({
+      status: "failed",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+const updateStatus = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    if (!user?.id) throw new AppError("user not found", 403);
+
+    if (user?.role !== USER_ROLE.ADMIN) {
+      throw new AppError(
+        "You do not have permission to access this resource",
+        403,
+      );
+    }
+
+    const { status } = req.body;
+    const { id } = req.params;
+    const result = await adminService.updateStatus(
+      id as string,
+      status as STATUS,
+    );
+
+    res.status(200).json({
+      status: "success",
+      message: "You successfully updated user status",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(error.statusCode ?? 500).json({
+      status: "failed",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+const getAllBookings = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    if (!user?.id) throw new AppError("user not found", 403);
+
+    if (user?.role !== USER_ROLE.ADMIN) {
+      throw new AppError(
+        "You do not have permission to access this resource",
+        403,
+      );
+    }
+
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    const result = await adminService.getAllBookings(page, limit);
+
+    res.status(200).json({
+      status: "success",
+      message: "You successfully retrieved all bookings",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(error.statusCode ?? 500).json({
+      status: "failed",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+const getAnalytics = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+    if (!user?.id) throw new AppError("user not found", 403);
+
+    if (user?.role !== USER_ROLE.ADMIN) {
+      throw new AppError(
+        "You do not have permission to access this resource",
+        403,
+      );
+    }
+
+    const result = await adminService.getAnalytics();
+
+    res.status(200).json({
+      status: "success",
+      message: "You successfully retrieved analytics",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(error.statusCode ?? 500).json({
+      status: "failed",
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
+export const adminController = {
+  getAllUsers,
+  updateStatus,
+  getAllBookings,
+  getAnalytics,
+};

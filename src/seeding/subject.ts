@@ -1,5 +1,5 @@
-import { SUBJECT_NAMES } from "../prisma/generated/prisma/enums";
-import { prisma } from "../src/lib/prisma";
+import { SUBJECT_NAMES } from "../../prisma/generated/prisma/enums";
+import { prisma } from "../lib/prisma";
 
 async function main() {
   const subjects = Object.values(SUBJECT_NAMES).map((name) => ({ name }));
