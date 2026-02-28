@@ -15,7 +15,10 @@ const getAllUsers = async (req: Request, res: Response) => {
       );
     }
 
-    const result = await adminService.getAllUsers();
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    const result = await adminService.getAllUsers(page, limit);
 
     res.status(200).json({
       status: "success",
@@ -76,11 +79,14 @@ const getAllBookings = async (req: Request, res: Response) => {
       );
     }
 
-    const result = await adminService.getAllBookings();
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    const result = await adminService.getAllBookings(page, limit);
 
     res.status(200).json({
       status: "success",
-      message: "You successfully retrived all users",
+      message: "You successfully retrieved all bookings",
       data: result,
     });
   } catch (error: any) {

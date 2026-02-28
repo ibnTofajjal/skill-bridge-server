@@ -1,10 +1,18 @@
 import { STATUS } from "../../../prisma/generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 
-const getAllUsers = async () => {
-  const users = await prisma.user.findMany();
+const getAllUsers = async (page: number, limit: number) => {
+  const skip = (page - 1) * limit;
 
-  return users;
+  const [users, total] = await prisma.$transaction([
+    prisma.user.findMany({ skip, take: limit, orderBy: { createdAt: "desc" } }),
+    prisma.user.count(),
+  ]);
+
+  return {
+    users,
+    meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+  };
 };
 
 const updateStatus = async (userId: string, status: STATUS) => {
@@ -28,15 +36,23 @@ const updateStatus = async (userId: string, status: STATUS) => {
   return updateUser;
 };
 
-const getAllBookings = async () => {
-  const bookings = await prisma.booking.findMany({
-    include: {
-      student: true,
-      tutor: true,
-    },
-  });
+const getAllBookings = async (page: number, limit: number) => {
+  const skip = (page - 1) * limit;
 
-  return bookings;
+  const [bookings, total] = await prisma.$transaction([
+    prisma.booking.findMany({
+      skip,
+      take: limit,
+      include: { student: true, tutor: true },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.booking.count(),
+  ]);
+
+  return {
+    bookings,
+    meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+  };
 };
 
 const getAnalytics = async () => {
