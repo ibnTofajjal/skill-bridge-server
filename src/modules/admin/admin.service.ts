@@ -6,6 +6,7 @@ const getAllUsers = async () => {
 
   return users;
 };
+
 const updateStatus = async (userId: string, status: STATUS) => {
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -27,7 +28,86 @@ const updateStatus = async (userId: string, status: STATUS) => {
   return updateUser;
 };
 
+const getAllBookings = async () => {
+  const bookings = await prisma.booking.findMany({
+    include: {
+      student: true,
+      tutor: true,
+    },
+  });
+
+  return bookings;
+};
+
+const getAnalytics = async () => {
+  const [
+    totalUsers,
+    bannedUsers,
+    totalStudents,
+    totalTutors,
+    subjects,
+    totalBookings,
+    pendingBookings,
+    confirmedBookings,
+    completedBookings,
+    cancelledBookings,
+  ] = await prisma.$transaction([
+    prisma.user.count(),
+    prisma.user.count({ where: { status: "BAN" } }),
+    prisma.user.count({ where: { role: "STUDENT" } }),
+    prisma.user.count({ where: { role: "TUTOR" } }),
+    prisma.subject.findMany({
+      include: {
+        tutorProfiles: {
+          select: {
+            id: true,
+            user: { select: { id: true, name: true, email: true } },
+          },
+        },
+      },
+    }),
+    prisma.booking.count(),
+    prisma.booking.count({ where: { status: "PENDING" } }),
+    prisma.booking.count({ where: { status: "CONFIRMED" } }),
+    prisma.booking.count({ where: { status: "COMPLETED" } }),
+    prisma.booking.count({ where: { status: "CANCELLED" } }),
+  ]);
+
+  return {
+    users: {
+      total: totalUsers,
+      active: totalUsers - bannedUsers,
+      banned: bannedUsers,
+      students: totalStudents,
+      tutors: totalTutors,
+    },
+    subjects: {
+      total: subjects.length,
+      data: subjects.map((subject) => ({
+        id: subject.id,
+        name: subject.name,
+        tutors: subject.tutorProfiles.map((profile) => ({
+          id: profile.user.id,
+          tutorProfileId: profile.id,
+          name: profile.user.name,
+          email: profile.user.email,
+        })),
+        tutorCount: subject.tutorProfiles.length,
+      })),
+    },
+    bookings: {
+      total: totalBookings,
+      pending: pendingBookings,
+      confirmed: confirmedBookings,
+      completed: completedBookings,
+      cancelled: cancelledBookings,
+    },
+  };
+};
+
 export const adminService = {
   getAllUsers,
   updateStatus,
+  getAllBookings,
+  getAnalytics,
 };

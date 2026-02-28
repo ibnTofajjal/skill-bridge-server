@@ -7,5 +7,7 @@ const router = express.Router();
 
 router.get("/users", auth(USER_ROLE.ADMIN), adminController.getAllUsers);
 router.patch("/users/:id", auth(USER_ROLE.ADMIN), adminController.updateStatus);
+router.get("/bookings", auth(USER_ROLE.ADMIN), adminController.getAllBookings);
+router.get("/analytics", auth(USER_ROLE.ADMIN), adminController.getAnalytics);
 
 export const adminRouter = router;
