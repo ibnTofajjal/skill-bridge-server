@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "npx tsx watch src/server.ts",
     "migrate": "pnpm dlx prisma migrate dev",
-    "generate": "pnpm dlx prisma generate"
+    "generate": "pnpm dlx prisma generate",
+    "seed:admin": "pnpm dlx tsx src/seeding/admin.ts"
   },
   "keywords": [],
   "author": "Joynal Bin Tofajjal",
