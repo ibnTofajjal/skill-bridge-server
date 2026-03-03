@@ -1,5 +1,5 @@
-import { prisma } from "../../lib/prisma";
 import { AppError } from "../../lib/AppError";
+import { prisma } from "../../lib/prisma";
 import {
   TutorAvailability,
   TutorProfileCreate,
@@ -57,10 +57,7 @@ const setAvailability = async (payload: TutorAvailability, userId: string) => {
   return availableTime;
 };
 
-const deleteAvailability = async (
-  availableSlotId: string,
-  userId: string,
-) => {
+const deleteAvailability = async (availableSlotId: string, userId: string) => {
   const slot = await prisma.availability.findFirst({
     where: { id: availableSlotId },
     include: { tutorProfile: { select: { userId: true } } },
@@ -142,7 +139,7 @@ const getAllTutors = async (filters: {
       skip,
       take: limit,
       include: {
-        user: { select: { id: true, name: true, email: true } },
+        user: { select: { id: true, name: true, email: true, role: true } },
         subject: true,
       },
       orderBy: { createdAt: "desc" },
