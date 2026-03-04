@@ -97,11 +97,27 @@ const allBooking = async (userId: string, role: string) => {
 
     return prisma.booking.findMany({
       where: { tutorProfileId: tutorProfile.id },
+      include: {
+        tutor: {
+          include: {
+            user: { select: { name: true } },
+            subject: { select: { name: true } },
+          },
+        },
+      },
     });
   }
 
   return prisma.booking.findMany({
     where: { studentId: userId },
+    include: {
+      tutor: {
+        include: {
+          user: { select: { name: true } },
+          subject: { select: { name: true } },
+        },
+      },
+    },
   });
 };
 
@@ -125,6 +141,14 @@ const singleBooking = async (
         id: parseInt(bookingId),
         tutorProfileId: tutorProfile.id,
       },
+      include: {
+        tutor: {
+          include: {
+            user: { select: { name: true } },
+            subject: { select: { name: true } },
+          },
+        },
+      },
     });
 
     if (!booking) {
@@ -141,6 +165,14 @@ const singleBooking = async (
     where: {
       id: parseInt(bookingId),
       studentId: userId,
+    },
+    include: {
+      tutor: {
+        include: {
+          user: { select: { name: true } },
+          subject: { select: { name: true } },
+        },
+      },
     },
   });
 
